@@ -1,3 +1,9 @@
+from engine.targeting import acquire_target
+from engine.movement import move_towards
+from engine.projectile import Projectile, resolve_projectile
+from engine.timing import can_act, apply_attack_timing
+from engine.ability import AbilityEngine
+from engine.traits import TraitSubsystem
 from engine.ability import AbilityEngine
 from engine.movement import move_towards
 from engine.projectile import Projectile, resolve_projectile
@@ -15,6 +21,8 @@ def simulate_battle_full(teamA, teamB):
 
     projectiles = []
     ability_engine = AbilityEngine()
+    trait_subsystem = TraitSubsystem()
+    trait_subsystem.apply_battle_start_effects(teamA, teamB)
 
     while teamA and teamB and time < 30:
         time += dt
@@ -40,6 +48,22 @@ def simulate_battle_full(teamA, teamB):
                     move_towards(unit, target, occupied)
 
         for proj in projectiles[:]:
+            hit_state = proj.update(dt)
+            if hit_state == "hit":
+                enemy_team = teamA if proj.source in teamB else teamB
+                resolve_projectile(proj, enemy_team)
+                projectiles.remove(proj)
+
+        dead_a = [u for u in teamA if u.hp <= 0]
+        dead_b = [u for u in teamB if u.hp <= 0]
+
+        for dead_unit in dead_a + dead_b:
+            trait_subsystem.handle_event(
+                "unit_death",
+                teamA,
+                teamB,
+                payload={"unit": dead_unit, "time": time},
+            )
             if proj.update(dt) == "hit":
                 enemies = teamB if proj.source in teamA else teamA
                 resolve_projectile(proj, enemies)
@@ -47,6 +71,8 @@ def simulate_battle_full(teamA, teamB):
 
         teamA = [u for u in teamA if u.hp > 0]
         teamB = [u for u in teamB if u.hp > 0]
+
+    trait_subsystem.remove_all_effects(teamA + teamB)
 
     return "A" if teamA else "B" if teamB else "Draw"
 

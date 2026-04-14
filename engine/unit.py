@@ -9,7 +9,8 @@ class Unit:
         self.traits = data["traits"]
         self.role = data["role"]
 
-        self.hp = 100
+        self.max_hp = 100
+        self.hp = self.max_hp
         self.dps = 10
         self.range = 1
 
