@@ -17,6 +17,10 @@ class Unit:
         self.range = self._read_stat(name, data, "range", default=1)
         self.attack_speed = self._read_stat(name, data, "attack_speed", default=1.0)
         self.projectile_speed = self._read_stat(name, data, "projectile_speed", default=1.0)
+        self.max_hp = 100
+        self.hp = self.max_hp
+        self.dps = 10
+        self.range = 1
 
         self.x = x
         self.y = y
