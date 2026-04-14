@@ -66,8 +66,6 @@ def simulate_battle_full(teamA, teamB):
         teamA = [u for u in teamA if u.hp > 0]
         teamB = [u for u in teamB if u.hp > 0]
 
-    trait_subsystem.remove_all_effects(teamA + teamB)
-
     return "A" if teamA else "B" if teamB else "Draw"
 
 
