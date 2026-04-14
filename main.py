@@ -1,22 +1,20 @@
-from engine.full_simulation import simulate_battle_full
-from engine.unit import Unit
+from data.troops import TROOPS
+from engine.draft import DraftEngine
+from engine.match import MatchEngine
 
 
 def main():
-    teamA = [
-        Unit("Monk", 0, 0),
-        Unit("Executioner", 1, 0),
-        Unit("Bandit", 2, 0),
-    ]
+    draft_engine = DraftEngine()
+    match_engine = MatchEngine()
 
-    teamB = [
-        Unit("Witch", 0, 2),
-        Unit("Royal Ghost", 1, 2),
-        Unit("Skeleton King", 2, 2),
-    ]
+    pool = list(TROOPS.keys())
+    team_a = draft_engine.build_roster(pool)
+    team_b = draft_engine.build_roster(reversed(pool))
 
-    result = simulate_battle_full(teamA, teamB)
-    print("Winner:", result)
+    result = match_engine.run_match(team_a, team_b)
+
+    print("Match score:", result.score)
+    print("Round history:", result.history)
 
 
 if __name__ == "__main__":
