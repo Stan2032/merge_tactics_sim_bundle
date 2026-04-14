@@ -7,6 +7,10 @@ from engine.traits import apply_start_of_battle_traits
 
 
 def simulate_battle_full(teamA, teamB):
+    """Resolve one battle between two already-positioned teams.
+
+    Match/round orchestration, drafting, and economy are intentionally external.
+    """
     time = 0
     dt = 0.1
 
@@ -62,4 +66,11 @@ def simulate_battle_full(teamA, teamB):
         teamA = [u for u in teamA if u.hp > 0]
         teamB = [u for u in teamB if u.hp > 0]
 
+    trait_subsystem.remove_all_effects(teamA + teamB)
+
     return "A" if teamA else "B" if teamB else "Draw"
+
+
+def resolve_single_battle(teamA, teamB):
+    """Explicit alias for external orchestration modules."""
+    return simulate_battle_full(teamA, teamB)
