@@ -1,6 +1,6 @@
 from engine.targeting import acquire_target
 from engine.movement import move_towards
-from engine.projectile import Projectile
+from engine.projectile import Projectile, resolve_projectile
 from engine.timing import can_act, apply_attack_timing
 from engine.ability import AbilityEngine
 
@@ -30,14 +30,23 @@ def simulate_battle_full(teamA, teamB):
                     continue
 
                 if unit.distance(target) <= unit.range:
-                    projectiles.append(Projectile(unit, target, unit.dps))
+                    projectiles.append(
+                        Projectile(
+                            source=unit,
+                            target=target,
+                            speed=unit.projectile_speed,
+                            damage=unit.dps,
+                        )
+                    )
                     apply_attack_timing(unit, time)
                 else:
                     move_towards(unit, target, occupied)
 
         for proj in projectiles[:]:
-            proj.update()
-            projectiles.remove(proj)
+            if proj.update(dt) == "hit":
+                target_team = teamB if proj.source in teamA else teamA
+                resolve_projectile(proj, target_team)
+                projectiles.remove(proj)
 
         teamA = [u for u in teamA if u.hp > 0]
         teamB = [u for u in teamB if u.hp > 0]
