@@ -1,11 +1,15 @@
-from engine.targeting import acquire_target
-from engine.movement import move_towards
-from engine.projectile import Projectile
-from engine.timing import can_act, apply_attack_timing
 from engine.ability import AbilityEngine
+from engine.movement import move_towards
+from engine.projectile import Projectile, resolve_projectile
+from engine.targeting import acquire_target
+from engine.timing import apply_attack_timing, can_act
 
 
 def simulate_battle_full(teamA, teamB):
+    """Resolve one battle between two already-positioned teams.
+
+    Match/round orchestration, drafting, and economy are intentionally external.
+    """
     time = 0
     dt = 0.1
 
@@ -30,16 +34,23 @@ def simulate_battle_full(teamA, teamB):
                     continue
 
                 if unit.distance(target) <= unit.range:
-                    projectiles.append(Projectile(unit, target, unit.dps))
+                    projectiles.append(Projectile(unit, target, speed=1, damage=unit.dps))
                     apply_attack_timing(unit, time)
                 else:
                     move_towards(unit, target, occupied)
 
         for proj in projectiles[:]:
-            proj.update()
-            projectiles.remove(proj)
+            if proj.update(dt) == "hit":
+                enemies = teamB if proj.source in teamA else teamA
+                resolve_projectile(proj, enemies)
+                projectiles.remove(proj)
 
         teamA = [u for u in teamA if u.hp > 0]
         teamB = [u for u in teamB if u.hp > 0]
 
     return "A" if teamA else "B" if teamB else "Draw"
+
+
+def resolve_single_battle(teamA, teamB):
+    """Explicit alias for external orchestration modules."""
+    return simulate_battle_full(teamA, teamB)
