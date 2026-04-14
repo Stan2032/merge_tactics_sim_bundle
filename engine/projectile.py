@@ -1,3 +1,6 @@
+import math
+
+
 class Projectile:
     def __init__(self, source, target, speed, damage, kind="linear", aoe=0, flight_time=0):
         self.source = source
@@ -27,18 +30,26 @@ class Projectile:
         dx = self.target.x - self.x
         dy = self.target.y - self.y
 
-        if abs(dx) + abs(dy) <= self.speed:
+        dist = math.hypot(dx, dy)
+        if dist == 0:
+            return "hit"
+        travel = self.speed * dt
+        if dist <= travel:
+            self.x = self.target.x
+            self.y = self.target.y
             return "hit"
 
-        if abs(dx) > abs(dy):
-            self.x += 1 if dx > 0 else -1
-        else:
-            self.y += 1 if dy > 0 else -1
+        ratio = travel / dist
+        self.x += dx * ratio
+        self.y += dy * ratio
 
         return None
 
 
 def resolve_projectile(proj, enemies):
+    if proj.target.hp <= 0:
+        return
+
     if proj.aoe > 0:
         for e in enemies:
             if abs(e.x - proj.target.x) + abs(e.y - proj.target.y) <= proj.aoe:

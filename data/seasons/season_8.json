@@ -1,0 +1,103 @@
+{
+  "season_id": "season_8",
+  "name": "Merge Tactics Season 8",
+  "effective_date_utc": "2026-04-13",
+  "source": {
+    "type": "official_patch_notes",
+    "title": "Merge Tactics Season 8",
+    "captured_from": "user-provided official page text"
+  },
+  "economy": {
+    "elixir_per_round": {
+      "value": 5,
+      "confidence": "high",
+      "note": "Patch notes: +1 elixir per round (now 5)."
+    },
+    "elixir_loong_per_round": {
+      "value": 6,
+      "confidence": "high",
+      "note": "Patch notes: with Elixir Loong ruler ability."
+    }
+  },
+  "ruler": {
+    "name": "Grand Warden",
+    "ability": {
+      "name": "Shield Sponsor",
+      "description": "Grants a random shield to the lowest-HP% ally at 5s and 15s; second shield has 3-tile break impact.",
+      "timings_seconds": [5, 15],
+      "secondary_impact_radius_tiles": 3
+    }
+  },
+  "troop_pool_changes": {
+    "departed": [],
+    "returned": [
+      "Executioner",
+      "Royal Ghost",
+      "Bandit",
+      "Princess"
+    ]
+  },
+  "trait_threshold_changes": {
+    "Ace": [2, 4],
+    "Assassin": [2, 4],
+    "Hinder": [2, 4],
+    "Noble": {
+      "default": [2, 4],
+      "with_ultimate_origins_modifier": [2, 4, 6]
+    },
+    "Undead": {
+      "default": [2, 4],
+      "with_ultimate_origins_modifier": [2, 4, 6]
+    },
+    "note": "6-troop tier is conditional (Ultimate Origins modifier), not unconditional baseline."
+  },
+  "new_modifiers": [
+    {
+      "name": "Rage Shield",
+      "unlock": "Bronze III",
+      "effect": "+50% hit and movement speed to tiled troop and surrounding allies for 8s after shield breaks"
+    },
+    {
+      "name": "Slowdown Shield",
+      "unlock": "Silver II",
+      "effect": "-35% hit and movement speed to surrounding enemies for 8s after shield breaks"
+    },
+    {
+      "name": "Star Shield",
+      "unlock": "Gold II",
+      "effect": "Tiled troop and surrounding allies level up after shield breaks"
+    },
+    {
+      "name": "Lava Shield",
+      "unlock": "Diamond",
+      "effect": "DOT to surrounding enemies for 8s at -10% max HP per second after shield breaks"
+    },
+    {
+      "name": "Winners Gonna Win",
+      "unlock": "Bronze II",
+      "effect": "Winning grants +2 Elixir"
+    },
+    {
+      "name": "3-Star Fantasy",
+      "unlock": "Silver I",
+      "effect": "3-Star troops gain +100% HP and +50% damage"
+    },
+    {
+      "name": "Trait Gift",
+      "unlock": "Silver II",
+      "effect": "Round End: each active trait grants +1 Elixir"
+    },
+    {
+      "name": "We are the Champions",
+      "unlock": "Gold I",
+      "effect": "5-Elixir troops gain +50% HP and +30% damage"
+    }
+  ],
+  "missing_baseline_fields": {
+    "troop_base_stats": "required",
+    "ability_damage_values": "required",
+    "projectile_speeds": "required",
+    "targeting_priorities": "required",
+    "notes": "Official season post provides deltas, not full baseline. Fill from previous full season snapshot + in-game validation."
+  }
+}

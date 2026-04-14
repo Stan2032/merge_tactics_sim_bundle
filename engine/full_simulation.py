@@ -1,8 +1,9 @@
 from engine.targeting import acquire_target
 from engine.movement import move_towards
-from engine.projectile import Projectile
+from engine.projectile import Projectile, resolve_projectile
 from engine.timing import can_act, apply_attack_timing
 from engine.ability import AbilityEngine
+from engine.traits import apply_start_of_battle_traits
 
 
 def simulate_battle_full(teamA, teamB):
@@ -11,6 +12,8 @@ def simulate_battle_full(teamA, teamB):
 
     projectiles = []
     ability_engine = AbilityEngine()
+    apply_start_of_battle_traits(teamA)
+    apply_start_of_battle_traits(teamB)
 
     while teamA and teamB and time < 30:
         time += dt
@@ -30,14 +33,31 @@ def simulate_battle_full(teamA, teamB):
                     continue
 
                 if unit.distance(target) <= unit.range:
-                    projectiles.append(Projectile(unit, target, unit.dps))
+                    projectile_speed = getattr(unit, "projectile_speed", 8)
+                    projectile = Projectile(
+                        source=unit,
+                        target=target,
+                        speed=projectile_speed,
+                        damage=unit.dps,
+                    )
+                    projectiles.append((projectile, enemies))
                     apply_attack_timing(unit, time)
                 else:
+                    old_pos = (unit.x, unit.y)
                     move_towards(unit, target, occupied)
+                    new_pos = (unit.x, unit.y)
+                    if new_pos != old_pos:
+                        occupied.discard(old_pos)
+                        occupied.add(new_pos)
 
-        for proj in projectiles[:]:
-            proj.update()
-            projectiles.remove(proj)
+        remaining_projectiles = []
+        for proj, enemies in projectiles:
+            result = proj.update(dt)
+            if result == "hit":
+                resolve_projectile(proj, enemies)
+            else:
+                remaining_projectiles.append((proj, enemies))
+        projectiles = remaining_projectiles
 
         teamA = [u for u in teamA if u.hp > 0]
         teamB = [u for u in teamB if u.hp > 0]
