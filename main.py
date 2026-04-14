@@ -2,7 +2,7 @@ from engine.full_simulation import simulate_battle_full
 from engine.unit import Unit
 
 
-if __name__ == "__main__":
+def main():
     teamA = [
         Unit("Monk", 0, 0),
         Unit("Executioner", 1, 0),
@@ -17,3 +17,7 @@ if __name__ == "__main__":
 
     result = simulate_battle_full(teamA, teamB)
     print("Winner:", result)
+
+
+if __name__ == "__main__":
+    main()
