@@ -42,12 +42,23 @@ def simulate_battle_full(teamA, teamB):
                     continue
 
                 if unit.distance(target) <= unit.range:
+                    projectiles.append(
+                        Projectile(
+                            source=unit,
+                            target=target,
+                            speed=unit.projectile_speed,
+                            damage=unit.dps,
+                        )
+                    )
                     projectiles.append(Projectile(unit, target, speed=1, damage=unit.dps))
                     apply_attack_timing(unit, time)
                 else:
                     move_towards(unit, target, occupied)
 
         for proj in projectiles[:]:
+            if proj.update(dt) == "hit":
+                target_team = teamB if proj.source in teamA else teamA
+                resolve_projectile(proj, target_team)
             hit_state = proj.update(dt)
             if hit_state == "hit":
                 enemy_team = teamA if proj.source in teamB else teamB
