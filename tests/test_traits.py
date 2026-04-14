@@ -1,51 +1,36 @@
 import unittest
 
-from engine.traits import TraitSubsystem
+from data.trait_effects import TRAIT_EFFECTS
+from engine.traits import apply_start_of_battle_traits, compute_active_trait_tiers
 from engine.unit import Unit
 
 
-class TraitSubsystemTests(unittest.TestCase):
-    def setUp(self):
-        self.subsystem = TraitSubsystem()
+class TraitTests(unittest.TestCase):
+    def test_trait_effects_have_provenance_marker(self):
+        self.assertEqual(TRAIT_EFFECTS["Ace"][2]["source"], "placeholder_inferred")
 
-    def test_compute_active_tiers_for_ace_and_undead(self):
-        ace_team = [Unit("Monk"), Unit("Executioner")]
-        undead_team = [Unit("Witch"), Unit("Royal Ghost")]
+    def test_compute_active_trait_tiers(self):
+        units = [Unit("Monk"), Unit("Executioner")]
+        active = compute_active_trait_tiers(units)
+        self.assertEqual(active.get("Ace"), 2)
 
-        ace_tiers = self.subsystem.compute_active_tiers(ace_team)
-        undead_tiers = self.subsystem.compute_active_tiers(undead_team)
+    def test_apply_start_of_battle_traits_ace_dps_buff(self):
+        units = [Unit("Monk"), Unit("Executioner")]
+        base_dps = units[0].dps
 
-        self.assertEqual(ace_tiers.get("Ace"), 2)
-        self.assertEqual(undead_tiers.get("Undead"), 2)
+        apply_start_of_battle_traits(units)
 
-    def test_descriptor_generation_for_supported_traits(self):
-        team = [Unit("Monk"), Unit("Executioner"), Unit("Witch"), Unit("Royal Ghost")]
+        self.assertGreater(units[0].dps, base_dps)
+        self.assertAlmostEqual(units[0].dps, base_dps * 1.10, places=6)
 
-        descriptors = self.subsystem.get_effect_descriptors(team)
-        as_map = {d.trait: d for d in descriptors}
+    def test_apply_start_of_battle_traits_undead_hp_buff(self):
+        units = [Unit("Witch"), Unit("Royal Ghost")]
+        base_hp = units[0].hp
 
-        self.assertIn("Ace", as_map)
-        self.assertIn("Undead", as_map)
-        self.assertEqual(as_map["Ace"].effect_type, "buff")
-        self.assertEqual(as_map["Undead"].effect_type, "modifier")
-        self.assertIn("unit_death", as_map["Undead"].triggers)
+        apply_start_of_battle_traits(units)
 
-    def test_battle_start_effects_apply_and_remove(self):
-        team_a = [Unit("Monk"), Unit("Executioner")]
-        team_b = [Unit("Witch"), Unit("Royal Ghost")]
-
-        monk_base_dps = team_a[0].dps
-        witch_base_max_hp = team_b[0].max_hp
-
-        self.subsystem.apply_battle_start_effects(team_a, team_b)
-
-        self.assertGreater(team_a[0].dps, monk_base_dps)
-        self.assertGreater(team_b[0].max_hp, witch_base_max_hp)
-
-        self.subsystem.remove_all_effects(team_a + team_b)
-
-        self.assertEqual(team_a[0].dps, monk_base_dps)
-        self.assertEqual(team_b[0].max_hp, witch_base_max_hp)
+        self.assertGreater(units[0].hp, base_hp)
+        self.assertAlmostEqual(units[0].hp, base_hp * 1.10, places=6)
 
 
 if __name__ == "__main__":
