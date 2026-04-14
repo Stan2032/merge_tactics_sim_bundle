@@ -1,7 +1,3 @@
-def distance(a, b):
-    return abs(a.x - b.x) + abs(a.y - b.y)
-
-
 def acquire_target(unit, enemies):
     enemies = [e for e in enemies if e.hp > 0]
     if not enemies:
@@ -13,4 +9,4 @@ def acquire_target(unit, enemies):
     if unit.role == "DPS":
         return min(enemies, key=lambda e: e.hp)
 
-    return min(enemies, key=lambda e: distance(unit, e))
+    return min(enemies, key=lambda e: unit.distance(e))
